@@ -4,8 +4,10 @@ os:
 language: erlang
 
 env:
-  - LUA=""
-  - LUA="luajit"
+  global:
+    - LUAROCKS=2.3.0
+  matrix:
+    - LUA=5.2
 
 sudo: false
 
@@ -14,10 +16,13 @@ dist: trusty
 git:
   depth: 5
 
-install:
-  - sudo apt-get install luajit
-  - sudo apt-get install luarocks
-  - sudo luarocks install luafilesystem
-  - sudo luarocks install busted
+before_install:
+  - source .travis/setenv_lua.sh
 
-script: ./bin/build.sh
+install:
+  - luarocks make
+  - luarocks install busted
+
+script:
+  - ./bin/build.sh
+  - busted spec
